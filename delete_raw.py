@@ -55,7 +55,7 @@ for filename in jpg_files:
             unmatched_jpg_count += 1
 
 
-if valid_jpg_files_count <= raw_files_count and raw_files_count > 0 and unmatched_jpg_count / raw_files_count < 0.02:
+if valid_jpg_files_count <= raw_files_count and raw_files_count > 0 and unmatched_jpg_count < 0.02 * raw_files_count:
     print(f"RAW图片：{raw_files_count} | 留下：{raw_files_count - len(raw_set)} | 删除：{len(raw_set)}")
 
     if raw_set:
