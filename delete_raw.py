@@ -6,14 +6,14 @@ import argparse
 import os
 import sys
 
-CAMERA_MAKE_FILE_SUFFIXES = dict(fuji=(".raf", ".jpg"), sony=(".arw", ".jpg"), canon=(".cr2", ".jpg"), nikon=(".nef", ".jpg"))
+CAMERA_MAKE_RAW_SUFFIXES = dict(fuji=".raf", sony=".arw", canon=".cr2", nikon=".nef")
 
 
 parser=argparse.ArgumentParser()
 
 parser.add_argument("--dir", help="RAW+JPG或RAW目录", type=str, required=True)
 parser.add_argument("--jpg_dir", help="JPG目录。默认为ori_jpg", default=None, type=str, required=False)
-parser.add_argument("--camera_make", help=f"相机厂商。目前仅支持：{', '.join(CAMERA_MAKE_FILE_SUFFIXES.keys())}", type=str, required=True)
+parser.add_argument("--camera_make", help=f"相机厂商。目前仅支持：{', '.join(CAMERA_MAKE_RAW_SUFFIXES.keys())}", type=str, required=True)
 
 args=parser.parse_args()
 
@@ -27,12 +27,11 @@ if args.jpg_dir is None:
 else:
     jpg_files = os.listdir(args.jpg_dir)
 
-if args.camera_make in CAMERA_MAKE_FILE_SUFFIXES:
-    raw_suffix, jpg_suffix = CAMERA_MAKE_FILE_SUFFIXES[args.camera_make]
+if args.camera_make in CAMERA_MAKE_RAW_SUFFIXES:
+    raw_suffix = CAMERA_MAKE_RAW_SUFFIXES[args.camera_make]
     raw_suffix_len = len(raw_suffix)
-    jpg_suffix_len = len(jpg_suffix)
 else:
-    print(f"不支持的相机厂商：{args.camera_make}。目前仅支持：{', '.join(CAMERA_MAKE_FILE_SUFFIXES.keys())}")
+    print(f"不支持的相机厂商：{args.camera_make}。目前仅支持：{', '.join(CAMERA_MAKE_RAW_SUFFIXES.keys())}")
     sys.exit(1)
 
 raw_set = set()
@@ -45,8 +44,9 @@ raw_files_count = len(raw_set)
 valid_jpg_files_count = 0
 unmatched_jpg_count = 0
 
-for filename in jpg_files:
-    if filename[-jpg_suffix_len:].lower() == jpg_suffix:
+if jpg_files:
+    jpg_suffix_len = len(jpg_files[0]) - jpg_files[0].rfind(".")
+    for filename in jpg_files:
         try:
             raw_set.remove(filename[0:-jpg_suffix_len])
             valid_jpg_files_count += 1
